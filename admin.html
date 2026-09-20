@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم | OBR Admin</title>
+  <style>
+    :root {
+      --bg-color: #06110d;
+      --card-bg: #0e2019;
+      --accent-green: #00ff87;
+      --accent-cyan: #00f0ff;
+      --accent-red: #ff3366;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: var(--bg-color); color: white; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    
+    .admin-card { background: var(--card-bg); padding: 25px; border-radius: 16px; width: 100%; max-width: 500px; border: 1px solid var(--accent-green); box-shadow: 0 8px 32px rgba(0, 255, 135, 0.2); }
+    h2 { color: var(--accent-green); margin-bottom: 20px; text-align: center; font-size: 1.5rem; }
+    
+    label { display: block; margin-bottom: 6px; color: #94bcae; font-size: 0.9rem; }
+    input, select, button { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--accent-green); background: #071510; color: white; font-size: 1rem; outline: none; }
+    input:focus, select:focus { border-color: var(--accent-cyan); box-shadow: 0 0 8px rgba(0, 240, 255, 0.4); }
+    
+    button.btn-add { background: linear-gradient(45deg, #00a859, var(--accent-green)); color: #000; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+    button.btn-add:hover { box-shadow: 0 0 15px rgba(0, 255, 135, 0.5); }
+    
+    .packages-list { margin-top: 15px; max-height: 250px; overflow-y: auto; padding-left: 5px; }
+    .pkg-item { background: #071510; padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border: 1px solid rgba(0, 255, 135, 0.2); }
+    .pkg-info { font-size: 0.95rem; }
+    .pkg-info strong { color: var(--accent-green); }
+    .del-btn { background: var(--accent-red); color: white; width: auto; padding: 6px 12px; margin: 0; border: none; font-size: 0.85rem; border-radius: 6px; cursor: pointer; }
+    .del-btn:hover { background: #cc0033; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-card">
+    <h2>⚙️ لوحة إدارة الباقات والأسعار</h2>
+
+    <label for="gameSelect">اختر اللعبة / القسم:</label>
+    <select id="gameSelect" onchange="loadCurrentPackages()">
+      <option value="ببجي (ID)">ببجي (ID)</option>
+      <option value="ببجي (حساب)">ببجي (حساب)</option>
+      <option value="فري فاير (ID)">فري فاير (ID)</option>
+      <option value="فري فاير (حساب)">فري فاير (حساب)</option>
+      <option value="بيس 2026 (Konami)">بيس 2026 (eFootball)</option>
+      <option value="فيفا (FC Points)">فيفا (FC Points)</option>
+    </select>
+
+    <h3 style="margin: 10px 0; color: var(--accent-cyan); font-size: 1.1rem;">إضافة باقة جديدة:</h3>
+    <input type="text" id="pkgName" placeholder="اسم الباقة (مثلاً: 325 شدة)">
+    <input type="text" id="pkgPrice" placeholder="السعر (مثلاً: 260ج / 5.2$)">
+    <button class="btn-add" onclick="addPackage()">إضافة / تحديث في المتجر 🚀</button>
+
+    <h3 style="margin-top: 15px; font-size: 1rem; color: #94bcae;">الباقات الحالية لهذا القسم:</h3>
+    <div class="packages-list" id="packagesList">جاري التحميل...</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDXKwZ8W0DQvphhU5p1Qlewsw2ZgQXKkoI",
+      authDomain: "obr-store.firebaseapp.com",
+      projectId: "obr-store",
+      storageBucket: "obr-store.firebasestorage.app",
+      messagingSenderId: "567411476671",
+      appId: "1:567411476671:web:9d6630393aa7a60db0de0a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let allPackages = {};
+
+    const pkgRef = ref(db, 'packages');
+    onValue(pkgRef, (snapshot) => {
+      allPackages = snapshot.val() || {};
+      loadCurrentPackages();
+    });
+
+    window.loadCurrentPackages = function() {
+      const selectedGame = document.getElementById('gameSelect').value;
+      const listDiv = document.getElementById('packagesList');
+      listDiv.innerHTML = '';
+
+      const currentList = allPackages[selectedGame] || [];
+
+      if (currentList.length === 0) {
+        listDiv.innerHTML = '<p style="text-align:center; color:#94bcae; padding:10px;">لا توجد باقات حالياً في هذا القسم.</p>';
+        return;
+      }
+
+      currentList.forEach((pkg, index) => {
+        const item = document.createElement('div');
+        item.className = 'pkg-item';
+        item.innerHTML = `
+          <div class="pkg-info">${pkg.name} — <strong>${pkg.price}</strong></div>
+          <button class="del-btn" onclick="deletePackage(${index})">حذف 🗑️</button>
+        `;
+        listDiv.appendChild(item);
+      });
+    };
+
+    window.addPackage = function() {
+      const game = document.getElementById('gameSelect').value;
+      const name = document.getElementById('pkgName').value.trim();
+      const price = document.getElementById('pkgPrice').value.trim();
+
+      if (!name || !price) {
+        alert('يرجى كتابة الاسم والسعر!');
+        return;
+      }
+
+      if (!allPackages[game]) allPackages[game] = [];
+      allPackages[game].push({ name, price });
+
+      set(ref(db, 'packages'), allPackages)
+        .then(() => {
+          document.getElementById('pkgName').value = '';
+          document.getElementById('pkgPrice').value = '';
+          alert('✅ تم إضافة الباقة وتحديث المتجر فوراً!');
+        });
+    };
+
+    window.deletePackage = function(index) {
+      const game = document.getElementById('gameSelect').value;
+      if (confirm('هل أنت تأكد من حذف هذه الباقة؟')) {
+        allPackages[game].splice(index, 1);
+
+        set(ref(db, 'packages'), allPackages)
+          .then(() => {
+            alert('🗑️ تم الحذف بنجاح!');
+          });
+      }
+    };
+  </script>
+</body>
+</html>
