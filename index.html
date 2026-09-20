@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OBR Store | متجر الشحن الرسمي</title>
+  <style>
+    :root {
+      --bg-color: #06110d;
+      --card-bg: #0e2019;
+      --accent-green: #00ff87;
+      --accent-dark-green: #00a859;
+      --accent-cyan: #00f0ff;
+      --accent-red: #ff3366;
+      --text-color: #ffffff;
+      --text-dim: #94bcae;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-color); padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    
+    header { text-align: center; margin-bottom: 20px; }
+    .logo { font-size: 2.8rem; font-weight: 900; background: linear-gradient(45deg, var(--accent-green), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 255, 135, 0.4); }
+    .badge-license { display: inline-block; background: rgba(0, 255, 135, 0.12); color: var(--accent-green); border: 1px solid var(--accent-green); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-top: 6px; font-weight: bold; }
+
+    /* Navigation Tabs */
+    .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; width: 100%; max-width: 650px; overflow-x: auto; padding-bottom: 5px; }
+    .tab-btn { flex: 1; min-width: 110px; padding: 12px 8px; background: var(--card-bg); border: 1px solid rgba(0, 255, 135, 0.3); color: white; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.3s; text-align: center; font-size: 0.9rem; white-space: nowrap; }
+    .tab-btn.active { background: linear-gradient(45deg, var(--accent-dark-green), var(--accent-green)); color: #000; border-color: transparent; box-shadow: 0 0 15px rgba(0, 255, 135, 0.4); }
+
+    .container { width: 100%; max-width: 650px; }
+    .card-panel { background: var(--card-bg); border: 1px solid rgba(0, 255, 135, 0.25); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); display: none; }
+    .card-panel.active { display: block; }
+    
+    h2 { color: var(--accent-green); margin-bottom: 15px; border-bottom: 1px solid rgba(0, 255, 135, 0.2); padding-bottom: 8px; font-size: 1.2rem; }
+
+    /* Games Grid */
+    .games-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+    .game-option { background: #071510; border: 2px solid transparent; border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; transition: 0.3s; }
+    .game-option.active, .game-option:hover { border-color: var(--accent-green); box-shadow: 0 0 12px rgba(0, 255, 135, 0.3); background: rgba(0, 255, 135, 0.05); }
+    .game-option h3 { font-size: 1rem; margin-top: 5px; color: #fff; }
+
+    /* Packages Grid */
+    .packages-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+    .pkg-card { background: #071510; border: 1px solid rgba(0, 255, 135, 0.3); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; transition: 0.3s; }
+    .pkg-card:hover, .pkg-card.selected { border-color: var(--accent-cyan); background: rgba(0, 240, 255, 0.1); box-shadow: 0 0 12px rgba(0, 240, 255, 0.3); }
+    .pkg-card .title { font-size: 0.9rem; font-weight: bold; color: white; }
+    .pkg-card .price { color: var(--accent-green); font-size: 1.1rem; font-weight: 900; margin-top: 5px; }
+
+    /* Forms & Inputs */
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 6px; color: var(--text-dim); font-size: 0.9rem; }
+    input, textarea { width: 100%; padding: 12px; background: #071510; border: 1px solid rgba(0, 255, 135, 0.4); border-radius: 8px; color: white; font-size: 0.95rem; outline: none; }
+    input:focus, textarea:focus { border-color: var(--accent-green); box-shadow: 0 0 8px rgba(0, 255, 135, 0.4); }
+
+    .payment-info { background: rgba(0, 255, 135, 0.08); border: 1px dashed var(--accent-green); border-radius: 8px; padding: 12px; margin-bottom: 18px; font-size: 0.9rem; line-height: 1.5; }
+    
+    .btn-submit { width: 100%; background: linear-gradient(45deg, var(--accent-dark-green), var(--accent-green)); color: #000; border: none; padding: 14px; font-size: 1.05rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+    .btn-submit:hover { box-shadow: 0 0 20px rgba(0, 255, 135, 0.6); }
+
+    /* Proofs Section */
+    .proof-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 15px; }
+    .proof-item { background: #071510; border: 1px solid rgba(0, 255, 135, 0.2); border-radius: 8px; overflow: hidden; text-align: center; padding: 8px; }
+    .proof-item img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; cursor: pointer; }
+    .proof-item p { font-size: 0.8rem; color: var(--text-dim); margin-top: 5px; }
+
+    .status-msg { margin-top: 15px; text-align: center; font-weight: bold; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">OBR STORE</div>
+    <div class="badge-license">🛡️ متجر مرخص وموثق رسميًا</div>
+  </header>
+
+  <div class="nav-tabs">
+    <div class="tab-btn active" onclick="switchTab('order-tab', this)">🛒 طلب شحن</div>
+    <div class="tab-btn" onclick="switchTab('proofs-tab', this)">📸 المعاملات الناجحة</div>
+    <div class="tab-btn" onclick="switchTab('complaints-tab', this)">📩 الشكاوى والخدمة</div>
+  </div>
+
+  <div class="container">
+    
+    <!-- Tab 1: Orders -->
+    <div class="card-panel active" id="order-tab">
+      <h2>1. اختر اللعبة</h2>
+      <div class="games-grid">
+        <div class="game-option active" id="opt-ff" onclick="selectGame('Free Fire')">🔥 <h3>فري فاير</h3></div>
+        <div class="game-option" id="opt-pubg" onclick="selectGame('PUBG Mobile')">🪂 <h3>ببجي موبايل</h3></div>
+        <div class="game-option" id="opt-roblox" onclick="selectGame('Roblox')">🧱 <h3>روبلوكس</h3></div>
+        <div class="game-option" id="opt-cod" onclick="selectGame('Call of Duty')">💥 <h3>كول اوف ديوتي</h3></div>
+      </div>
+
+      <h2>2. اختر الباقة</h2>
+      <div class="packages-grid" id="packagesGrid">جاري تحضير الباقات...</div>
+
+      <form id="orderForm" onsubmit="sendOrderToTelegram(event)">
+        <div class="form-group">
+          <label for="customerName">اسمك الكامل:</label>
+          <input type="text" id="customerName" placeholder="أدخل اسمك" required>
+        </div>
+
+        <div class="form-group">
+          <label for="playerId">معرف اللاعب (Player ID / Account):</label>
+          <input type="text" id="playerId" placeholder="أدخل الـ ID الخاص بك" required>
+        </div>
+
+        <div class="payment-info">
+          💳 <strong>طريقة الدفع (شام كاش - Sham Cash):</strong><br>
+          المعرف: <strong style="color:var(--accent-green)">SHAM-OBR-102030</strong><br>
+          أرفق صورة إيصال التحويل لإتمام العملية بسرعة.
+        </div>
+
+        <div class="form-group">
+          <label for="receiptImg">صورة إيصال التحويل:</label>
+          <input type="file" id="receiptImg" accept="image/*" required>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">تأكيد وإرسال الطلب 🚀</button>
+        <div class="status-msg" id="statusMsg"></div>
+      </form>
+    </div>
+
+    <!-- Tab 2: Successful Transactions Proofs -->
+    <div class="card-panel" id="proofs-tab">
+      <h2>📸 إثباتات عمليات الشحن الناجحة</h2>
+      <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 15px;">
+        نعرض لكم جزءاً من عمليات الشحن اليومية الموثوقة لعملائنا الكرام.
+      </p>
+
+      <div class="proof-grid" id="proofsContainer">
+        <div class="proof-item">
+          <img src="https://via.placeholder.com/150/0e2019/00ff87?text=معاملة+1" alt="شحن ناجح" onclick="window.open(this.src)">
+          <p>شحن فري فاير ✅</p>
+        </div>
+        <div class="proof-item">
+          <img src="https://via.placeholder.com/150/0e2019/00ff87?text=معاملة+2" alt="شحن ناجح" onclick="window.open(this.src)">
+          <p>شحن روبلوكس ✅</p>
+        </div>
+        <div class="proof-item">
+          <img src="https://via.placeholder.com/150/0e2019/00ff87?text=معاملة+3" alt="شحن ناجح" onclick="window.open(this.src)">
+          <p>شحن ببجي ✅</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Complaints & Support -->
+    <div class="card-panel" id="complaints-tab">
+      <h2>📩 قسم الشكاوى والاستفسارات</h2>
+      <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 15px;">
+        تواجه مشكلة أو لديك استفسار؟ تواصل مع الإدارة مباشرة وسيتم الرد عليك فوراً.
+      </p>
+
+      <form id="complaintForm" onsubmit="sendComplaintToTelegram(event)">
+        <div class="form-group">
+          <label for="compName">الاسم:</label>
+          <input type="text" id="compName" placeholder="اسمك الكامل" required>
+        </div>
+
+        <div class="form-group">
+          <label for="compContact">رقم التواصل أو المعرف:</label>
+          <input type="text" id="compContact" placeholder="رقم الواتساب أو اليوزر" required>
+        </div>
+
+        <div class="form-group">
+          <label for="compMessage">تفاصيل الشكوى أو الطلب:</label>
+          <textarea id="compMessage" rows="4" placeholder="اكتب مشكلتك هنا بوضوح..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="compSubmitBtn">إرسال الشكوى للإدارة 📤</button>
+        <div class="status-msg" id="compStatusMsg"></div>
+      </form>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDXKwZ8W0DQvphhU5p1Qlewsw2ZgQXKkoI",
+      authDomain: "obr-store.firebaseapp.com",
+      projectId: "obr-store",
+      storageBucket: "obr-store.firebasestorage.app",
+      messagingSenderId: "567411476671",
+      appId: "1:567411476671:web:9d6630393aa7a60db0de0a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const TELEGRAM_TOKEN = "8937931148:AAFmbpB_nn3iqNhOPgQOGMzt-pCpSW8MD50";
+    const CHAT_ID = "8322514038";
+
+    window.selectedGame = 'Free Fire';
+    window.selectedPackage = '';
+    let dbPackages = {};
+
+    // Fetch Packages from Firebase
+    const pkgRef = ref(db, 'packages');
+    onValue(pkgRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        dbPackages = data;
+      } else {
+        // Default initial data
+        dbPackages = {
+          'Free Fire': [{ name: '100 جوهرة', price: '1.00$' }, { name: '310 جواهر', price: '3.00$' }],
+          'PUBG Mobile': [{ name: '60 شدة', price: '1.00$' }],
+          'Roblox': [{ name: '80 Robux', price: '1.20$' }, { name: '400 Robux', price: '5.50$' }],
+          'Call of Duty': [{ name: '80 CP', price: '1.10$' }, { name: '420 CP', price: '5.00$' }]
+        };
+      }
+      renderPackages();
+    });
+
+    window.renderPackages = function() {
+      const grid = document.getElementById('packagesGrid');
+      grid.innerHTML = '';
+      const list = dbPackages[window.selectedGame] || [];
+      if (list.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--text-dim);">لا توجد باقات متوفرة لهذه اللعبة حالياً</p>';
+        return;
+      }
+      list.forEach((pkg, index) => {
+        const card = document.createElement('div');
+        card.className = `pkg-card ${index === 0 ? 'selected' : ''}`;
+        if (index === 0) window.selectedPackage = `${pkg.name} — ${pkg.price}`;
+
+        card.innerHTML = `
+          <div class="title">${pkg.name}</div>
+          <div class="price">${pkg.price}</div>
+        `;
+
+        card.onclick = () => {
+          document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          window.selectedPackage = `${pkg.name} — ${pkg.price}`;
+        };
+
+        grid.appendChild(card);
+      });
+    };
+
+    window.selectGame = function(game) {
+      window.selectedGame = game;
+      document.getElementById('opt-ff').classList.toggle('active', game === 'Free Fire');
+      document.getElementById('opt-pubg').classList.toggle('active', game === 'PUBG Mobile');
+      document.getElementById('opt-roblox').classList.toggle('active', game === 'Roblox');
+      document.getElementById('opt-cod').classList.toggle('active', game === 'Call of Duty');
+      renderPackages();
+    };
+
+    window.switchTab = function(tabId, btn) {
+      document.querySelectorAll('.card-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    };
+
+    // Send Order Function
+    window.sendOrderToTelegram = function(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submitBtn');
+      const statusMsg = document.getElementById('statusMsg');
+      const name = document.getElementById('customerName').value;
+      const playerId = document.getElementById('playerId').value;
+      const fileInput = document.getElementById('receiptImg');
+
+      if (!fileInput.files || !fileInput.files[0]) return;
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'جاري الإرسال... ⏳';
+
+      const formData = new FormData();
+      formData.append('chat_id', CHAT_ID);
+      formData.append('photo', fileInput.files[0]);
+
+      const captionText = `🚀 طلب شحن جديد (OBR Store)\n\n` +
+                          `👤 الاسم: ${name}\n` +
+                          `🎮 اللعبة: ${window.selectedGame}\n` +
+                          `🆔 الـ ID: ${playerId}\n` +
+                          `💎 الباقة: ${window.selectedPackage}\n` +
+                          `⏰ الوقت: ${new Date().toLocaleTimeString('ar-EG')}`;
+
+      formData.append('caption', captionText);
+
+      fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) {
+          statusMsg.style.color = '#00ff87';
+          statusMsg.innerText = '✅ تم إرسال طلبك بنجاح!';
+          document.getElementById('orderForm').reset();
+          renderPackages();
+        } else {
+          statusMsg.style.color = '#ff3366';
+          statusMsg.innerText = '❌ فشل الإرسال، تحقق من الصورة.';
+        }
+      })
+      .catch(() => {
+        statusMsg.style.color = '#ff3366';
+        statusMsg.innerText = '❌ حدث خطأ في الاتصال.';
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'تأكيد وإرسال الطلب 🚀';
+      });
+    };
+
+    // Send Complaint Function
+    window.sendComplaintToTelegram = function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('compSubmitBtn');
+      const status = document.getElementById('compStatusMsg');
+      const name = document.getElementById('compName').value;
+      const contact = document.getElementById('compContact').value;
+      const message = document.getElementById('compMessage').value;
+
+      btn.disabled = true;
+      btn.innerText = 'جاري الإرسال... ⏳';
+
+      const text = `⚠️ شكوى / استفسار جديد (OBR Store)\n\n` +
+                   `👤 الاسم: ${name}\n` +
+                   `📱 للتواصل: ${contact}\n` +
+                   `📝 الرسالة:\n${message}`;
+
+      fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CHAT_ID, text: text })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) {
+          status.style.color = '#00ff87';
+          status.innerText = '✅ تم إرسال رسالتك للإدارة بنجاح!';
+          document.getElementById('complaintForm').reset();
+        } else {
+          status.style.color = '#ff3366';
+          status.innerText = '❌ حدث خطأ، يرجى المحاولة لاحقاً.';
+        }
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.innerText = 'إرسال الشكوى للإدارة 📤';
+      });
+    };
+  </script>
+</body>
+</html>
